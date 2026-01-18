@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CreateWarehouseUseCase.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">java-code-assignment</a> &gt; <a href="index.source.html" class="el_package">com.fulfilment.application.monolith.warehouses.domain.usecases</a> &gt; <span class="el_source">CreateWarehouseUseCase.java</span></div><h1>CreateWarehouseUseCase.java</h1><pre class="source lang-java linenums">package com.fulfilment.application.monolith.warehouses.domain.usecases;
+
+import com.fulfilment.application.monolith.warehouses.domain.models.Location;
+import com.fulfilment.application.monolith.warehouses.domain.models.Warehouse;
+import com.fulfilment.application.monolith.warehouses.domain.ports.CreateWarehouseOperation;
+import com.fulfilment.application.monolith.warehouses.domain.ports.LocationResolver;
+import com.fulfilment.application.monolith.warehouses.domain.ports.WarehouseStore;
+import jakarta.enterprise.context.ApplicationScoped;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
+
+@ApplicationScoped
+public class CreateWarehouseUseCase implements CreateWarehouseOperation {
+
+    private final WarehouseStore warehouseStore;
+    private final LocationResolver locationResolver;
+
+    // We inject LocationResolver to get location limits
+<span class="nc" id="L20">    public CreateWarehouseUseCase(WarehouseStore warehouseStore, LocationResolver locationResolver) {</span>
+<span class="nc" id="L21">        this.warehouseStore = warehouseStore;</span>
+<span class="nc" id="L22">        this.locationResolver = locationResolver;</span>
+<span class="nc" id="L23">    }</span>
+
+    @Override
+    public void create(Warehouse warehouse) {
+        // 1. Validate: Business Unit Code Verification (Must be unique)
+<span class="nc bnc" id="L28" title="All 2 branches missed.">        if (warehouseStore.findByBusinessUnitCode(warehouse.businessUnitCode) != null) {</span>
+<span class="nc" id="L29">            throw new IllegalArgumentException(&quot;Warehouse with Business Unit Code &quot; + warehouse.businessUnitCode + &quot; already exists.&quot;);</span>
+        }
+
+        // 2. Validate: Location existence (Throws exception if not found - logic from Task 1)
+<span class="nc" id="L33">        Location location = locationResolver.resolveByIdentifier(warehouse.location);</span>
+
+        // 3. Validate: Stock cannot exceed Capacity
+<span class="nc bnc" id="L36" title="All 2 branches missed.">        if (warehouse.stock &gt; warehouse.capacity) {</span>
+<span class="nc" id="L37">            throw new IllegalArgumentException(&quot;Stock cannot exceed warehouse capacity.&quot;);</span>
+        }
+
+        // 4. Validate: Feasibility &amp; Capacity (Check against existing warehouses)
+<span class="nc" id="L41">        List&lt;Warehouse&gt; existingWarehousesInLocation = warehouseStore.getAll().stream()</span>
+<span class="nc" id="L42">                .filter(w -&gt; Objects.equals(w.location, warehouse.location))</span>
+<span class="nc bnc" id="L43" title="All 2 branches missed.">                .filter(w -&gt; w.archivedAt == null) // Only count active warehouses</span>
+<span class="nc" id="L44">                .toList();</span>
+
+        // 4a. Check Max Number of Warehouses
+<span class="nc bnc" id="L47" title="All 2 branches missed.">        if (existingWarehousesInLocation.size() &gt;= location.maxNumberOfWarehouses) {</span>
+<span class="nc" id="L48">            throw new IllegalStateException(&quot;Cannot create warehouse. Max number of warehouses (&quot;</span>
+                    + location.maxNumberOfWarehouses + &quot;) reached for location &quot; + warehouse.location);
+        }
+
+        // 4b. Check Max Capacity
+<span class="nc" id="L53">        int currentUsedCapacity = existingWarehousesInLocation.stream()</span>
+<span class="nc" id="L54">                .mapToInt(w -&gt; w.capacity)</span>
+<span class="nc" id="L55">                .sum();</span>
+
+<span class="nc bnc" id="L57" title="All 2 branches missed.">        if (currentUsedCapacity + warehouse.capacity &gt; location.maxCapacity) {</span>
+<span class="nc" id="L58">            throw new IllegalStateException(&quot;Cannot create warehouse. Max capacity (&quot;</span>
+                    + location.maxCapacity + &quot;) would be exceeded for location &quot; + warehouse.location);
+        }
+
+        // 5. Setup data and Save
+<span class="nc" id="L63">        warehouse.createdAt = LocalDateTime.now();</span>
+<span class="nc" id="L64">        warehouse.archivedAt = null; // Ensure it's active</span>
+
+<span class="nc" id="L66">        warehouseStore.create(warehouse);</span>
+<span class="nc" id="L67">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
