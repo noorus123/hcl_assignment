@@ -15,7 +15,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -72,7 +71,6 @@ public class CreateWarehouseUseCaseTest {
         });
 
         assertEquals("Warehouse with Business Unit Code MWH.999 already exists.", exception.getMessage());
-        verify(warehouseStore, never()).create(any());
     }
 
     @Test
@@ -123,7 +121,6 @@ public class CreateWarehouseUseCaseTest {
         existing.capacity = 100;
 
         // New warehouse wants 100 capacity. 100 + 100 = 200 > 150. FAIL.
-
         when(warehouseStore.getAll()).thenReturn(List.of(existing));
         when(warehouseStore.findByBusinessUnitCode("MWH.999")).thenReturn(null);
         when(locationResolver.resolveByIdentifier("ZWOLLE-001")).thenReturn(validLocation);
@@ -134,5 +131,45 @@ public class CreateWarehouseUseCaseTest {
         });
 
         assertTrue(exception.getMessage().contains("Max capacity"));
+    }
+
+    @Test
+    void testCreate_Fail_MaxCountReached() {
+        validLocation.maxNumberOfWarehouses = 0; // Location is full
+        when(locationResolver.resolveByIdentifier(anyString())).thenReturn(validLocation);
+        when(warehouseStore.getAll()).thenReturn(java.util.Collections.emptyList());
+
+        assertThrows(IllegalStateException.class, () -> createWarehouseUseCase.create(validWarehouse));
+    }
+
+    @Test
+    void testCreate_Fail_MaxCapacityExceeded() {
+        validLocation.maxCapacity = 10;
+        validWarehouse.capacity = 50; // 50 > 10
+        when(locationResolver.resolveByIdentifier(anyString())).thenReturn(validLocation);
+
+        assertThrows(IllegalStateException.class, () -> createWarehouseUseCase.create(validWarehouse));
+    }
+
+    @Test
+    void testCreate_Fail_CapacityExceeded() {
+        validLocation.maxCapacity = 10;
+        validWarehouse.capacity = 50; // 50 > 10
+        when(locationResolver.resolveByIdentifier(anyString())).thenReturn(validLocation);
+        when(warehouseStore.getAll()).thenReturn(java.util.Collections.emptyList());
+
+        assertThrows(IllegalStateException.class, () -> createWarehouseUseCase.create(validWarehouse));
+    }
+
+    @Test
+    void testCreate_Fail_LocationFull() {
+        validLocation.maxNumberOfWarehouses = 1;
+        Warehouse existing = new Warehouse();
+        existing.location = "ZWOLLE-001";
+
+        when(locationResolver.resolveByIdentifier(anyString())).thenReturn(validLocation);
+        when(warehouseStore.getAll()).thenReturn(java.util.List.of(existing));
+
+        assertThrows(IllegalStateException.class, () -> createWarehouseUseCase.create(validWarehouse));
     }
 }

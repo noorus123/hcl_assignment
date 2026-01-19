@@ -16,7 +16,7 @@ public class CreateWarehouseUseCase implements CreateWarehouseOperation {
     private final WarehouseStore warehouseStore;
     private final LocationResolver locationResolver;
 
-    // We inject LocationResolver to get location limits
+    // inject LocationResolver to get location limits
     public CreateWarehouseUseCase(WarehouseStore warehouseStore, LocationResolver locationResolver) {
         this.warehouseStore = warehouseStore;
         this.locationResolver = locationResolver;
@@ -24,12 +24,18 @@ public class CreateWarehouseUseCase implements CreateWarehouseOperation {
 
     @Override
     public void create(Warehouse warehouse) {
-        // 1. Validate: Business Unit Code Verification (Must be unique)
+
+        // Validate: Only block if an ACTIVE warehouse with this code exists
         if (warehouseStore.findByBusinessUnitCode(warehouse.businessUnitCode) != null) {
             throw new IllegalArgumentException("Warehouse with Business Unit Code " + warehouse.businessUnitCode + " already exists.");
         }
 
-        // 2. Validate: Location existence (Throws exception if not found - logic from Task 1)
+        // 1. Validate: Business Unit Code Verification
+        if (warehouseStore.findByBusinessUnitCode(warehouse.businessUnitCode) != null) {
+            throw new IllegalArgumentException("Warehouse with Business Unit Code " + warehouse.businessUnitCode + " already exists.");
+        }
+
+        // 2. Validate: Location existence
         Location location = locationResolver.resolveByIdentifier(warehouse.location);
 
         // 3. Validate: Stock cannot exceed Capacity
@@ -37,7 +43,7 @@ public class CreateWarehouseUseCase implements CreateWarehouseOperation {
             throw new IllegalArgumentException("Stock cannot exceed warehouse capacity.");
         }
 
-        // 4. Validate: Feasibility & Capacity (Check against existing warehouses)
+        // 4. Validate: Feasibility & Capacity
         List<Warehouse> existingWarehousesInLocation = warehouseStore.getAll().stream()
                 .filter(w -> Objects.equals(w.location, warehouse.location))
                 .filter(w -> w.archivedAt == null) // Only count active warehouses
@@ -61,7 +67,7 @@ public class CreateWarehouseUseCase implements CreateWarehouseOperation {
 
         // 5. Setup data and Save
         warehouse.createdAt = LocalDateTime.now();
-        warehouse.archivedAt = null; // Ensure it's active
+        warehouse.archivedAt = null;
 
         warehouseStore.create(warehouse);
     }

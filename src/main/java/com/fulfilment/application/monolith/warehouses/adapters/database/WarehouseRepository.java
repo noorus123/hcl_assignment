@@ -52,7 +52,7 @@ public class WarehouseRepository implements WarehouseStore, PanacheRepository<Db
 
     @Override
     public Warehouse findByBusinessUnitCode(String buCode) {
-        DbWarehouse entity = find("businessUnitCode", buCode).firstResult();
+        DbWarehouse entity = find("businessUnitCode = ?1 and archivedAt is null", buCode).firstResult();
         if (entity == null) {
             return null;
         }

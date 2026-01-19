@@ -8,18 +8,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-// Logic assertions (assertEquals, assertThrows, etc.)
-import static org.junit.jupiter.api.Assertions.*;
-
-// Mockito behaviors (when, verify, times, never)
 import static org.mockito.Mockito.*;
-
-// Mockito argument matchers (any, anyString)
-import static org.mockito.ArgumentMatchers.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ReplaceWarehouseUseCaseTest {
