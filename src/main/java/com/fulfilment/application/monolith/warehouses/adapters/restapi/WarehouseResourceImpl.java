@@ -1,5 +1,6 @@
 package com.fulfilment.application.monolith.warehouses.adapters.restapi;
 
+import com.fulfilment.application.monolith.stores.StoreResource;
 import com.fulfilment.application.monolith.warehouses.adapters.database.WarehouseRepository;
 import com.fulfilment.application.monolith.warehouses.domain.usecases.ArchiveWarehouseUseCase;
 import com.fulfilment.application.monolith.warehouses.domain.usecases.CreateWarehouseUseCase;
@@ -10,6 +11,8 @@ import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.WebApplicationException;
+import org.jboss.logging.Logger;
+
 import java.util.List;
 
 @RequestScoped
@@ -21,6 +24,8 @@ public class WarehouseResourceImpl implements WarehouseResource {
     @Inject ArchiveWarehouseUseCase archiveWarehouseUseCase;
     @Inject ReplaceWarehouseUseCase replaceWarehouseUseCase;
 
+    private static final Logger LOGGER = Logger.getLogger(WarehouseResourceImpl.class.getName());
+
     @Override
     public List<Warehouse> listAllWarehousesUnits() {
         return warehouseRepository.getAll().stream().map(this::toResponse).toList();
@@ -28,6 +33,7 @@ public class WarehouseResourceImpl implements WarehouseResource {
 
     @Override
     public Warehouse createANewWarehouseUnit(Warehouse data) {
+        LOGGER.info("Request received to create Warehouse: " + data.getBusinessUnitCode());
         try {
             var domain = toDomain(data);
             createWarehouseUseCase.create(domain);
@@ -47,6 +53,7 @@ public class WarehouseResourceImpl implements WarehouseResource {
 
     @Override
     public void archiveAWarehouseUnitByID(String id) {
+        LOGGER.info("Archiving warehouse with BU Code: " + id);
         var domain = warehouseRepository.findByBusinessUnitCode(id);
         if (domain == null) throw new WebApplicationException("Warehouse not found", 404);
         archiveWarehouseUseCase.archive(domain);

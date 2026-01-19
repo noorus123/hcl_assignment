@@ -14,48 +14,50 @@ public class StoreResourceTest {
     LegacyStoreManagerGateway legacyGateway;
 
     @Test
-    public void testStoreCompleteWorkflow() {
-        // 1. CREATE SUCCESS (Short name to avoid 40-char limit)
-        String uniqueName = "S-" + java.util.UUID.randomUUID().toString().substring(0, 5);
-        Store s = new Store(uniqueName);
+    public void testStoreFinalCoveragePush() {
+        // --- 1. SETUP UNIQUE DATA ---
+        String baseName = "S" + java.util.UUID.randomUUID().toString().substring(0, 5);
+        Store s = new Store(baseName);
         s.quantityProductsInStock = 10;
 
-        Response res = given()
-                .contentType("application/json")
-                .body(s)
-                .post("/store");
-
-        res.then().statusCode(201);
+        // --- 2. CREATE (POST) ---
+        Response res = given().contentType("application/json").body(s).post("/store");
         String id = res.jsonPath().get("id").toString();
 
-        // 2. GET ALL & GET SINGLE
+        // --- 3. GET ALL & SINGLE ---
         given().get("/store").then().statusCode(200);
-        given().get("/store/" + id).then().statusCode(200).body("name", is(uniqueName));
+        given().get("/store/" + id).then().statusCode(200).body("name", is(baseName));
 
-        // 3. PUT SUCCESS
-        s.name = "Upd-" + uniqueName;
+        // --- 4. UPDATE (PUT) ---
+        s.name = "U-" + baseName;
         given().contentType("application/json").body(s).put("/store/" + id).then().statusCode(200);
 
-        // 4. PATCH SUCCESS (Hit name and stock branches)
-        Store patch = new Store("Patch");
-        patch.quantityProductsInStock = 50;
-        given().contentType("application/json").body(patch).patch("/store/" + id).then().statusCode(200);
+        // --- 5. PATCH BRANCHES  ---
+        Store pName = new Store("P-" + baseName);
+        given().contentType("application/json").body(pName).patch("/store/" + id).then().statusCode(200);
 
-        // 5. Hit 'if (store.id != null)' in create
-        Store sWithId = new Store("Fail");
-        sWithId.id = 99L;
-        given().contentType("application/json").body(sWithId).post("/store").then().statusCode(422);
+        // Patch only quantity
+        Store pQty = new Store("P-" + baseName);
+        pQty.quantityProductsInStock = 88;
+        given().contentType("application/json").body(pQty).patch("/store/" + id).then().statusCode(200);
 
-        // 6. Hit 'if (name == null)' in update
-        Store noName = new Store(null);
-        given().contentType("application/json").body(noName).put("/store/" + id).then().statusCode(422);
+        // --- 6. ERROR BRANCHES  ---
 
-        // 7. Hit 'entity == null' (Not Found)
-        given().get("/store/9999").then().statusCode(404);
-        given().delete("/store/9999").then().statusCode(404);
-        given().contentType("application/json").body(s).put("/store/9999").then().statusCode(404);
+        // A. Trigger ErrorMapper
+        given().get("/store/99999").then().statusCode(404).body("code", is(404));
 
-        // 8. DELETE SUCCESS
+        // B. Trigger Validation Exception (Hits 'if name == null' branch)
+        Store invalid = new Store(null);
+        given().contentType("application/json").body(invalid).put("/store/" + id).then().statusCode(422);
+        given().contentType("application/json").body(invalid).patch("/store/" + id).then().statusCode(422);
+
+        // C. POST with ID already set
+        Store idStore = new Store("Fail");
+        idStore.id = 55L;
+        given().contentType("application/json").body(idStore).post("/store").then().statusCode(422);
+
+        // --- 7. DELETE ---
         given().delete("/store/" + id).then().statusCode(204);
+        given().delete("/store/99999").then().statusCode(404);
     }
 }

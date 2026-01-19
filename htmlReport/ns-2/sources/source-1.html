@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>Coverage Report > Product</title>
+  <title>Coverage Report > LocationGateway</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope:     <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.fulfilment.application.monolith.products</a>
+    <a href="../index.html">com.fulfilment.application.monolith.location</a>
 </div>
 
-<h1>Coverage Summary for Class: Product (com.fulfilment.application.monolith.products)</h1>
+<h1>Coverage Summary for Class: LocationGateway (com.fulfilment.application.monolith.location)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -38,13 +41,13 @@ Current scope:     <a href="../../index.html">all classes</a>
 </th>
 </tr>
 <tr>
-  <td class="name">Product</td>
+  <td class="name">LocationGateway</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (2/2)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -55,29 +58,16 @@ Current scope:     <a href="../../index.html">all classes</a>
     (3/3)
   </span>
 </td>
-</tr>
-  <tr>
-    <td class="name">Product$HibernateProxy$rSxixqx3</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (2/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (3/3)
+    (14/14)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -85,36 +75,36 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.fulfilment.application.monolith.products;
+<code class="sourceCode" id="sourceCode">&nbsp;package com.fulfilment.application.monolith.location;
 &nbsp;
-&nbsp;import jakarta.persistence.Cacheable;
-&nbsp;import jakarta.persistence.Column;
-&nbsp;import jakarta.persistence.Entity;
-&nbsp;import jakarta.persistence.GeneratedValue;
-&nbsp;import jakarta.persistence.Id;
-&nbsp;import java.math.BigDecimal;
+&nbsp;import com.fulfilment.application.monolith.warehouses.domain.models.Location;
+&nbsp;import com.fulfilment.application.monolith.warehouses.domain.ports.LocationResolver;
+&nbsp;import jakarta.enterprise.context.ApplicationScoped;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
 &nbsp;
-&nbsp;@Entity
-&nbsp;@Cacheable
-&nbsp;public class Product {
+&nbsp;@ApplicationScoped
+<b class="fc">&nbsp;public class LocationGateway implements LocationResolver {</b>
 &nbsp;
-&nbsp;  @Id @GeneratedValue public Long id;
+<b class="fc">&nbsp;  private static final List&lt;Location&gt; locations = new ArrayList&lt;&gt;();</b>
 &nbsp;
-&nbsp;  @Column(length = 40, unique = true)
-&nbsp;  public String name;
+&nbsp;  static {
+<b class="fc">&nbsp;    locations.add(new Location(&quot;ZWOLLE-001&quot;, 1, 40));</b>
+<b class="fc">&nbsp;    locations.add(new Location(&quot;ZWOLLE-002&quot;, 2, 50));</b>
+<b class="fc">&nbsp;    locations.add(new Location(&quot;AMSTERDAM-001&quot;, 5, 100));</b>
+<b class="fc">&nbsp;    locations.add(new Location(&quot;AMSTERDAM-002&quot;, 3, 75));</b>
+<b class="fc">&nbsp;    locations.add(new Location(&quot;TILBURG-001&quot;, 1, 40));</b>
+<b class="fc">&nbsp;    locations.add(new Location(&quot;HELMOND-001&quot;, 1, 45));</b>
+<b class="fc">&nbsp;    locations.add(new Location(&quot;EINDHOVEN-001&quot;, 2, 70));</b>
+<b class="fc">&nbsp;    locations.add(new Location(&quot;VETSBY-001&quot;, 1, 90));</b>
+&nbsp;  }
 &nbsp;
-&nbsp;  @Column(nullable = true)
-&nbsp;  public String description;
-&nbsp;
-&nbsp;  @Column(precision = 10, scale = 2, nullable = true)
-&nbsp;  public BigDecimal price;
-&nbsp;
-&nbsp;  public int stock;
-&nbsp;
-<b class="fc">&nbsp;  public Product() {}</b>
-&nbsp;
-<b class="fc">&nbsp;  public Product(String name) {</b>
-<b class="fc">&nbsp;    this.name = name;</b>
+&nbsp;  @Override
+&nbsp;  public Location resolveByIdentifier(String identifier) {
+<b class="fc">&nbsp;      return locations.stream()</b>
+<b class="fc">&nbsp;              .filter(loc -&gt; loc.identification.equals(identifier))</b>
+<b class="fc">&nbsp;              .findFirst()</b>
+<b class="fc">&nbsp;              .orElseThrow(() -&gt; new RuntimeException(&quot;Location not found: &quot; + identifier));</b>
 &nbsp;  }
 &nbsp;}
 </code>
@@ -140,7 +130,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-01-19 08:06</div>
+    <div style="float:right;">generated on 2026-01-19 22:39</div>
 </div>
 </body>
 </html>

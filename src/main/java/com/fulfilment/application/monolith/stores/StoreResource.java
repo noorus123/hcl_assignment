@@ -55,6 +55,7 @@ public class StoreResource {
     @POST
     @Transactional
     public Response create(Store store) {
+        LOGGER.info("Creating new store: " + store.name);
         if (store.id != null) {
             throw new WebApplicationException("Id was invalidly set on request.", 422);
         }

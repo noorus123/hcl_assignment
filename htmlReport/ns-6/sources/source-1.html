@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>Coverage Report > Location</title>
+  <title>Coverage Report > WarehouseResourceImpl</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope:     <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.fulfilment.application.monolith.warehouses.domain.models</a>
+    <a href="../index.html">com.fulfilment.application.monolith.warehouses.adapters.restapi</a>
 </div>
 
-<h1>Coverage Summary for Class: Location (com.fulfilment.application.monolith.warehouses.domain.models)</h1>
+<h1>Coverage Summary for Class: WarehouseResourceImpl (com.fulfilment.application.monolith.warehouses.adapters.restapi)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -37,11 +37,15 @@ Current scope:     <a href="../../index.html">all classes</a>
 </th>
 <th class="coverageStat 
 ">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
   Line, %
 </th>
 </tr>
 <tr>
-  <td class="name">Location</td>
+  <td class="name">WarehouseResourceImpl</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -55,15 +59,23 @@ Current scope:     <a href="../../index.html">all classes</a>
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (9/9)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    50%
   </span>
   <span class="absValue">
-    (4/4)
+    (2/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.3%
+  </span>
+  <span class="absValue">
+    (28/30)
   </span>
 </td>
 </tr>
@@ -75,22 +87,96 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.fulfilment.application.monolith.warehouses.domain.models;
+<code class="sourceCode" id="sourceCode">&nbsp;package com.fulfilment.application.monolith.warehouses.adapters.restapi;
 &nbsp;
-&nbsp;public class Location {
-&nbsp;  public String identification;
+&nbsp;import com.fulfilment.application.monolith.stores.StoreResource;
+&nbsp;import com.fulfilment.application.monolith.warehouses.adapters.database.WarehouseRepository;
+&nbsp;import com.fulfilment.application.monolith.warehouses.domain.usecases.ArchiveWarehouseUseCase;
+&nbsp;import com.fulfilment.application.monolith.warehouses.domain.usecases.CreateWarehouseUseCase;
+&nbsp;import com.fulfilment.application.monolith.warehouses.domain.usecases.ReplaceWarehouseUseCase;
+&nbsp;import com.warehouse.api.WarehouseResource;
+&nbsp;import com.warehouse.api.beans.Warehouse;
+&nbsp;import jakarta.enterprise.context.RequestScoped;
+&nbsp;import jakarta.inject.Inject;
+&nbsp;import jakarta.transaction.Transactional;
+&nbsp;import jakarta.ws.rs.WebApplicationException;
+&nbsp;import org.jboss.logging.Logger;
 &nbsp;
-&nbsp;  // maximum number of warehouses that can be created in this location
-&nbsp;  public int maxNumberOfWarehouses;
+&nbsp;import java.util.List;
 &nbsp;
-&nbsp;  // maximum capacity of the location summing all the warehouse capacities
-&nbsp;  public int maxCapacity;
+&nbsp;@RequestScoped
+&nbsp;@Transactional
+<b class="fc">&nbsp;public class WarehouseResourceImpl implements WarehouseResource {</b>
 &nbsp;
-<b class="fc">&nbsp;  public Location(String identification, int maxNumberOfWarehouses, int maxCapacity) {</b>
-<b class="fc">&nbsp;    this.identification = identification;</b>
-<b class="fc">&nbsp;    this.maxNumberOfWarehouses = maxNumberOfWarehouses;</b>
-<b class="fc">&nbsp;    this.maxCapacity = maxCapacity;</b>
-&nbsp;  }
+&nbsp;    @Inject WarehouseRepository warehouseRepository;
+&nbsp;    @Inject CreateWarehouseUseCase createWarehouseUseCase;
+&nbsp;    @Inject ArchiveWarehouseUseCase archiveWarehouseUseCase;
+&nbsp;    @Inject ReplaceWarehouseUseCase replaceWarehouseUseCase;
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(WarehouseResourceImpl.class.getName());</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;Warehouse&gt; listAllWarehousesUnits() {
+<b class="fc">&nbsp;        return warehouseRepository.getAll().stream().map(this::toResponse).toList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Warehouse createANewWarehouseUnit(Warehouse data) {
+<b class="fc">&nbsp;        LOGGER.info(&quot;Request received to create Warehouse: &quot; + data.getBusinessUnitCode());</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            var domain = toDomain(data);</b>
+<b class="fc">&nbsp;            createWarehouseUseCase.create(domain);</b>
+<b class="fc">&nbsp;            return toResponse(domain);</b>
+&nbsp;        } catch (IllegalArgumentException | IllegalStateException e) {
+&nbsp;            // Map business rule violations to 400 Bad Request
+<b class="nc">&nbsp;            throw new WebApplicationException(e.getMessage(), 400);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Warehouse getAWarehouseUnitByID(String id) {
+<b class="fc">&nbsp;        var domain = warehouseRepository.findByBusinessUnitCode(id);</b>
+<b class="pc">&nbsp;        if (domain == null) throw new WebApplicationException(&quot;Warehouse not found&quot;, 404);</b>
+<b class="fc">&nbsp;        return toResponse(domain);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void archiveAWarehouseUnitByID(String id) {
+<b class="fc">&nbsp;        LOGGER.info(&quot;Archiving warehouse with BU Code: &quot; + id);</b>
+<b class="fc">&nbsp;        var domain = warehouseRepository.findByBusinessUnitCode(id);</b>
+<b class="pc">&nbsp;        if (domain == null) throw new WebApplicationException(&quot;Warehouse not found&quot;, 404);</b>
+<b class="fc">&nbsp;        archiveWarehouseUseCase.archive(domain);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Warehouse replaceTheCurrentActiveWarehouse(String businessUnitCode, Warehouse data) {
+&nbsp;        try {
+<b class="fc">&nbsp;            replaceWarehouseUseCase.replace(businessUnitCode, toDomain(data));</b>
+<b class="fc">&nbsp;            return data;</b>
+&nbsp;        } catch (IllegalArgumentException | IllegalStateException e) {
+<b class="nc">&nbsp;            throw new WebApplicationException(e.getMessage(), 400);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    // Mapper: Domain Model -&gt; API Bean
+&nbsp;    private Warehouse toResponse(com.fulfilment.application.monolith.warehouses.domain.models.Warehouse domain) {
+<b class="fc">&nbsp;        var r = new Warehouse();</b>
+<b class="fc">&nbsp;        r.setBusinessUnitCode(domain.businessUnitCode);</b>
+<b class="fc">&nbsp;        r.setLocation(domain.location);</b>
+<b class="fc">&nbsp;        r.setCapacity(domain.capacity);</b>
+<b class="fc">&nbsp;        r.setStock(domain.stock);</b>
+<b class="fc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Mapper: API Bean -&gt; Domain Model
+&nbsp;    private com.fulfilment.application.monolith.warehouses.domain.models.Warehouse toDomain(Warehouse api) {
+<b class="fc">&nbsp;        var d = new com.fulfilment.application.monolith.warehouses.domain.models.Warehouse();</b>
+<b class="fc">&nbsp;        d.businessUnitCode = api.getBusinessUnitCode();</b>
+<b class="fc">&nbsp;        d.location = api.getLocation();</b>
+<b class="fc">&nbsp;        d.capacity = api.getCapacity();</b>
+<b class="fc">&nbsp;        d.stock = api.getStock();</b>
+<b class="fc">&nbsp;        return d;</b>
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -115,7 +201,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-01-19 08:06</div>
+    <div style="float:right;">generated on 2026-01-19 22:39</div>
 </div>
 </body>
 </html>

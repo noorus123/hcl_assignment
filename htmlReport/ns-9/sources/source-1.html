@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>Coverage Report > WarehouseResource</title>
+  <title>Coverage Report > Warehouse</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,34 +19,55 @@
 <div class="breadCrumbs">
 Current scope:     <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.warehouse.api</a>
+    <a href="../index.html">com.warehouse.api.beans</a>
 </div>
 
-<h1>Coverage Summary for Class: WarehouseResource (com.warehouse.api)</h1>
+<h1>Coverage Summary for Class: Warehouse (com.warehouse.api.beans)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
 </tr>
-  <tr>
-    <td class="name">WarehouseResource$quarkusrestinvoker$archiveAWarehouseUnitByID_66a42843b3d14b92d256dce13239143dcb50ff65</td>
-  </tr>
-  <tr>
-    <td class="name">WarehouseResource$quarkusrestinvoker$createANewWarehouseUnit_cc350e480f9fc0aeb3b238edd98030eaddddb83c</td>
-  </tr>
-  <tr>
-    <td class="name">WarehouseResource$quarkusrestinvoker$getAWarehouseUnitByID_a18037fb1420bb1b83555291afe1771653252546</td>
-  </tr>
-  <tr>
-    <td class="name">WarehouseResource$quarkusrestinvoker$listAllWarehousesUnits_79af7b3aa42f732b91479b26af91f17d8d5b0eb2</td>
-  </tr>
-  <tr>
-    <td class="name">WarehouseResource$quarkusrestinvoker$replaceTheCurrentActiveWarehouse_bf5f0de4c41064a1a9a70763e7e82883e9d3c1b2</td>
-  </tr>
 <tr>
-  <td class="name"><strong>Total</strong></td>
+  <td class="name">Warehouse</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90.9%
+  </span>
+  <span class="absValue">
+    (10/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90.9%
+  </span>
+  <span class="absValue">
+    (10/11)
+  </span>
+</td>
 </tr>
+
 </table>
 
 <br/>
@@ -54,58 +75,86 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.warehouse.api;
+<code class="sourceCode" id="sourceCode">&nbsp;
+&nbsp;package com.warehouse.api.beans;
 &nbsp;
-&nbsp;import com.warehouse.api.beans.Warehouse;
-&nbsp;import jakarta.validation.constraints.NotNull;
-&nbsp;import jakarta.ws.rs.Consumes;
-&nbsp;import jakarta.ws.rs.DELETE;
-&nbsp;import jakarta.ws.rs.GET;
-&nbsp;import jakarta.ws.rs.POST;
-&nbsp;import jakarta.ws.rs.Path;
-&nbsp;import jakarta.ws.rs.PathParam;
-&nbsp;import jakarta.ws.rs.Produces;
-&nbsp;import java.util.List;
+&nbsp;import javax.annotation.processing.Generated;
+&nbsp;import com.fasterxml.jackson.annotation.JsonInclude;
+&nbsp;import com.fasterxml.jackson.annotation.JsonProperty;
+&nbsp;import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 &nbsp;
-&nbsp;/**
-&nbsp; * A JAX-RS interface. An implementation of this interface must be provided.
-&nbsp; */
-&nbsp;@Path(&quot;/warehouse&quot;)
-&nbsp;public interface WarehouseResource {
-&nbsp;  @GET
-&nbsp;  @Produces(&quot;application/json&quot;)
-&nbsp;  List&lt;Warehouse&gt; listAllWarehousesUnits();
+&nbsp;@JsonInclude(JsonInclude.Include.NON_NULL)
+&nbsp;@JsonPropertyOrder({
+&nbsp;    &quot;id&quot;,
+&nbsp;    &quot;businessUnitCode&quot;,
+&nbsp;    &quot;location&quot;,
+&nbsp;    &quot;capacity&quot;,
+&nbsp;    &quot;stock&quot;
+&nbsp;})
+&nbsp;@Generated(&quot;jsonschema2pojo&quot;)
+<b class="fc">&nbsp;public class Warehouse {</b>
 &nbsp;
-&nbsp;  @POST
-&nbsp;  @Produces(&quot;application/json&quot;)
-&nbsp;  @Consumes(&quot;application/json&quot;)
-&nbsp;  Warehouse createANewWarehouseUnit(@NotNull Warehouse data);
+&nbsp;    @JsonProperty(&quot;id&quot;)
+&nbsp;    private String id;
+&nbsp;    @JsonProperty(&quot;businessUnitCode&quot;)
+&nbsp;    private String businessUnitCode;
+&nbsp;    @JsonProperty(&quot;location&quot;)
+&nbsp;    private String location;
+&nbsp;    @JsonProperty(&quot;capacity&quot;)
+&nbsp;    private Integer capacity;
+&nbsp;    @JsonProperty(&quot;stock&quot;)
+&nbsp;    private Integer stock;
 &nbsp;
-&nbsp;  @Path(&quot;/{id}&quot;)
-&nbsp;  @GET
-&nbsp;  @Produces(&quot;application/json&quot;)
-&nbsp;  Warehouse getAWarehouseUnitByID(@PathParam(&quot;id&quot;) String id);
+&nbsp;    @JsonProperty(&quot;id&quot;)
+&nbsp;    public String getId() {
+<b class="fc">&nbsp;        return id;</b>
+&nbsp;    }
 &nbsp;
-&nbsp;  @Path(&quot;/{id}&quot;)
-&nbsp;  @DELETE
-&nbsp;  void archiveAWarehouseUnitByID(@PathParam(&quot;id&quot;) String id);
+&nbsp;    @JsonProperty(&quot;id&quot;)
+&nbsp;    public void setId(String id) {
+<b class="nc">&nbsp;        this.id = id;</b>
+&nbsp;    }
 &nbsp;
-&nbsp;  /**
-&nbsp;   * &lt;p&gt;
-&nbsp;   * Replaces the current active Warehouse identified by
-&nbsp;   * &lt;code&gt;businessUnitCode&lt;/code&gt; unit by a new Warehouse provided in the request
-&nbsp;   * body A Warehouse can be replaced by another Warehouse with the same Business
-&nbsp;   * Unit Code. That means that the previous Warehouse will be archived and the
-&nbsp;   * new Warehouse will be created assuming its place.
-&nbsp;   * &lt;/p&gt;
-&nbsp;   * 
-&nbsp;   */
-&nbsp;  @Path(&quot;/{businessUnitCode}/replacement&quot;)
-&nbsp;  @POST
-&nbsp;  @Produces(&quot;application/json&quot;)
-&nbsp;  @Consumes(&quot;application/json&quot;)
-&nbsp;  Warehouse replaceTheCurrentActiveWarehouse(@PathParam(&quot;businessUnitCode&quot;) String businessUnitCode,
-&nbsp;      @NotNull Warehouse data);
+&nbsp;    @JsonProperty(&quot;businessUnitCode&quot;)
+&nbsp;    public String getBusinessUnitCode() {
+<b class="fc">&nbsp;        return businessUnitCode;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @JsonProperty(&quot;businessUnitCode&quot;)
+&nbsp;    public void setBusinessUnitCode(String businessUnitCode) {
+<b class="fc">&nbsp;        this.businessUnitCode = businessUnitCode;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @JsonProperty(&quot;location&quot;)
+&nbsp;    public String getLocation() {
+<b class="fc">&nbsp;        return location;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @JsonProperty(&quot;location&quot;)
+&nbsp;    public void setLocation(String location) {
+<b class="fc">&nbsp;        this.location = location;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @JsonProperty(&quot;capacity&quot;)
+&nbsp;    public Integer getCapacity() {
+<b class="fc">&nbsp;        return capacity;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @JsonProperty(&quot;capacity&quot;)
+&nbsp;    public void setCapacity(Integer capacity) {
+<b class="fc">&nbsp;        this.capacity = capacity;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @JsonProperty(&quot;stock&quot;)
+&nbsp;    public Integer getStock() {
+<b class="fc">&nbsp;        return stock;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @JsonProperty(&quot;stock&quot;)
+&nbsp;    public void setStock(Integer stock) {
+<b class="fc">&nbsp;        this.stock = stock;</b>
+&nbsp;    }
+&nbsp;
 &nbsp;}
 </code>
 </pre>
@@ -130,7 +179,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-01-19 08:06</div>
+    <div style="float:right;">generated on 2026-01-19 22:39</div>
 </div>
 </body>
 </html>
