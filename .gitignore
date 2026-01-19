@@ -4,3 +4,6 @@ target/
 .mvn/wrapper/maven-wrapper.jar
 *.log
 .DS_Store
+
+# Exclude local coverage reports
+htmlReport/
