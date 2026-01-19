@@ -41,52 +41,52 @@ Current scope:     <a href="../../index.html">all classes</a>
   <td class="name">LegacyStoreManagerGateway</td>
 <td class="coverageStat">
   <span class="percent">
-    25%
+    40%
   </span>
   <span class="absValue">
-    (1/4)
+    (2/5)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    7.7%
+    12.5%
   </span>
   <span class="absValue">
-    (1/13)
+    (2/16)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">LegacyStoreManagerGateway$MockitoMock$l8IshlJg</td>
+    <td class="name">LegacyStoreManagerGateway$MockitoMock$X3drk2Ij</td>
   </tr>
   <tr>
-    <td class="name">LegacyStoreManagerGateway$MockitoMock$l8IshlJg$auxiliary$6mo7pTPz</td>
+    <td class="name">LegacyStoreManagerGateway$MockitoMock$X3drk2Ij$auxiliary$38NeZUGW</td>
   </tr>
   <tr>
-    <td class="name">LegacyStoreManagerGateway$MockitoMock$l8IshlJg$auxiliary$AyrryZ5r</td>
+    <td class="name">LegacyStoreManagerGateway$MockitoMock$X3drk2Ij$auxiliary$b1rGnrQp</td>
   </tr>
   <tr>
-    <td class="name">LegacyStoreManagerGateway$MockitoMock$l8IshlJg$auxiliary$BPy8nKia</td>
+    <td class="name">LegacyStoreManagerGateway$MockitoMock$X3drk2Ij$auxiliary$khkNPx8f</td>
   </tr>
   <tr>
-    <td class="name">LegacyStoreManagerGateway$MockitoMock$l8IshlJg$auxiliary$gszFO7Ge</td>
+    <td class="name">LegacyStoreManagerGateway$MockitoMock$X3drk2Ij$auxiliary$vygUAOz8</td>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    25%
+    40%
   </span>
   <span class="absValue">
-    (1/4)
+    (2/5)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    7.7%
+    12.5%
   </span>
   <span class="absValue">
-    (1/13)
+    (2/16)
   </span>
 </td>
 </tr>
@@ -102,51 +102,53 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;import jakarta.enterprise.context.ApplicationScoped;
 &nbsp;import java.nio.file.Files;
 &nbsp;import java.nio.file.Path;
+&nbsp;import org.jboss.logging.Logger;
 &nbsp;
 &nbsp;@ApplicationScoped
 <b class="fc">&nbsp;public class LegacyStoreManagerGateway {</b>
 &nbsp;
-&nbsp;  public void createStoreOnLegacySystem(Store store) {
-&nbsp;    // just to emulate as this would send this to a legacy system, let&#39;s write a temp file with the
-<b class="nc">&nbsp;    writeToFile(store);</b>
-&nbsp;  }
+<b class="fc">&nbsp;    private static final Logger LOG = Logger.getLogger(LegacyStoreManagerGateway.class);</b>
 &nbsp;
-&nbsp;  public void updateStoreOnLegacySystem(Store store) {
-&nbsp;    // just to emulate as this would send this to a legacy system, let&#39;s write a temp file with the
-<b class="nc">&nbsp;    writeToFile(store);</b>
-&nbsp;  }
-&nbsp;
-&nbsp;  private void writeToFile(Store store) {
-&nbsp;    try {
-&nbsp;      // Step 1: Create a temporary file
-&nbsp;      Path tempFile;
-&nbsp;
-<b class="nc">&nbsp;      tempFile = Files.createTempFile(store.name, &quot;.txt&quot;);</b>
-&nbsp;
-<b class="nc">&nbsp;      System.out.println(&quot;Temporary file created at: &quot; + tempFile.toString());</b>
-&nbsp;
-&nbsp;      // Step 2: Write data to the temporary file
-<b class="nc">&nbsp;      String content =</b>
-&nbsp;          &quot;Store created. [ name =&quot;
-&nbsp;              + store.name
-&nbsp;              + &quot; ] [ items on stock =&quot;
-&nbsp;              + store.quantityProductsInStock
-&nbsp;              + &quot;]&quot;;
-<b class="nc">&nbsp;      Files.write(tempFile, content.getBytes());</b>
-<b class="nc">&nbsp;      System.out.println(&quot;Data written to temporary file.&quot;);</b>
-&nbsp;
-&nbsp;      // Step 3: Optionally, read the data back to verify
-<b class="nc">&nbsp;      String readContent = new String(Files.readAllBytes(tempFile));</b>
-<b class="nc">&nbsp;      System.out.println(&quot;Data read from temporary file: &quot; + readContent);</b>
-&nbsp;
-&nbsp;      // Step 4: Delete the temporary file when done
-<b class="nc">&nbsp;      Files.delete(tempFile);</b>
-<b class="nc">&nbsp;      System.out.println(&quot;Temporary file deleted.&quot;);</b>
-&nbsp;
-&nbsp;    } catch (Exception e) {
-<b class="nc">&nbsp;      e.printStackTrace();</b>
+&nbsp;    public void createStoreOnLegacySystem(Store store) {
+<b class="nc">&nbsp;        LOG.info(&quot;Sending CREATE store request to legacy system: &quot; + store.name);</b>
+<b class="nc">&nbsp;        writeToFile(store);</b>
 &nbsp;    }
-&nbsp;  }
+&nbsp;
+&nbsp;    public void updateStoreOnLegacySystem(Store store) {
+<b class="nc">&nbsp;        LOG.info(&quot;Sending UPDATE store request to legacy system: &quot; + store.name);</b>
+<b class="nc">&nbsp;        writeToFile(store);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void writeToFile(Store store) {
+&nbsp;        try {
+&nbsp;            // Step 1: Create a temporary file
+&nbsp;            Path tempFile;
+&nbsp;
+<b class="nc">&nbsp;            tempFile = Files.createTempFile(store.name, &quot;.txt&quot;);</b>
+<b class="nc">&nbsp;            LOG.info(&quot;Temporary file created at: &quot; + tempFile);</b>
+&nbsp;
+&nbsp;            // Step 2: Write data to the temporary file
+<b class="nc">&nbsp;            String content =</b>
+&nbsp;                    &quot;Store created. [ name =&quot;
+&nbsp;                            + store.name
+&nbsp;                            + &quot; ] [ items on stock =&quot;
+&nbsp;                            + store.quantityProductsInStock
+&nbsp;                            + &quot;]&quot;;
+<b class="nc">&nbsp;            Files.write(tempFile, content.getBytes());</b>
+<b class="nc">&nbsp;            LOG.debug(&quot;Data written to temporary file&quot;);</b>
+&nbsp;
+&nbsp;            // Step 3: Optionally, read the data back to verify
+<b class="nc">&nbsp;            String readContent = new String(Files.readAllBytes(tempFile));</b>
+<b class="nc">&nbsp;            LOG.debug(&quot;Data read from temporary file: &quot; + readContent);</b>
+&nbsp;
+&nbsp;            // Step 4: Delete the temporary file when done
+<b class="nc">&nbsp;            Files.delete(tempFile);</b>
+<b class="nc">&nbsp;            LOG.debug(&quot;Temporary file deleted&quot;);</b>
+&nbsp;
+&nbsp;        } catch (Exception e) {
+<b class="nc">&nbsp;            LOG.error(&quot;Error while writing to legacy system file&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -171,7 +173,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-01-19 22:39</div>
+    <div style="float:right;">generated on 2026-01-20 00:04</div>
 </div>
 </body>
 </html>

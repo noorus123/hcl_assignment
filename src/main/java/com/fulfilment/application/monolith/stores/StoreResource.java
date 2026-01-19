@@ -62,12 +62,9 @@ public class StoreResource {
 
         store.persist();
 
-        //Only call legacy system AFTER transaction commits
         transactionRegistry.registerInterposedSynchronization(new Synchronization() {
             @Override
-            public void beforeCompletion() {
-                // No action needed
-            }
+            public void beforeCompletion() { }
 
             @Override
             public void afterCompletion(int status) {
@@ -97,17 +94,13 @@ public class StoreResource {
         entity.name = updatedStore.name;
         entity.quantityProductsInStock = updatedStore.quantityProductsInStock;
 
-        //Only call legacy system AFTER transaction commits
         transactionRegistry.registerInterposedSynchronization(new Synchronization() {
             @Override
-            public void beforeCompletion() {
-                // No action needed
-            }
+            public void beforeCompletion() { }
 
             @Override
             public void afterCompletion(int status) {
                 if (status == Status.STATUS_COMMITTED) {
-                    // We send 'entity' because it holds the actual persisted data
                     legacyStoreManagerGateway.updateStoreOnLegacySystem(entity);
                 }
             }
@@ -141,9 +134,7 @@ public class StoreResource {
         //Only call legacy system AFTER transaction commits
         transactionRegistry.registerInterposedSynchronization(new Synchronization() {
             @Override
-            public void beforeCompletion() {
-                // No action needed
-            }
+            public void beforeCompletion() {}
 
             @Override
             public void afterCompletion(int status) {

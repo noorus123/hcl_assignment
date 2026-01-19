@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>Coverage Report > LegacyStoreManagerGateway</title>
+  <title>Coverage Report > AssociateWarehouseUseCase</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,25 @@
 <div class="breadCrumbs">
 Current scope:     <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.fulfilment.application.monolith.stores</a>
+    <a href="../index.html">com.fulfilment.application.monolith.fulfillment</a>
 </div>
 
-<h1>Coverage Summary for Class: LegacyStoreManagerGateway (com.fulfilment.application.monolith.stores)</h1>
+<h1>Coverage Summary for Class: AssociateWarehouseUseCase (com.fulfilment.application.monolith.fulfillment)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
+  Class, %
+</th>
+<th class="coverageStat 
+">
   Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
 </th>
 <th class="coverageStat 
 ">
@@ -38,58 +45,41 @@ Current scope:     <a href="../../index.html">all classes</a>
 </th>
 </tr>
 <tr>
-  <td class="name">LegacyStoreManagerGateway</td>
+  <td class="name">AssociateWarehouseUseCase</td>
 <td class="coverageStat">
   <span class="percent">
-    25%
+    100%
   </span>
   <span class="absValue">
-    (1/4)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    7.7%
+    100%
   </span>
   <span class="absValue">
-    (1/13)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">LegacyStoreManagerGateway$MockitoMock$OrxY4lGm</td>
-  </tr>
-  <tr>
-    <td class="name">LegacyStoreManagerGateway$MockitoMock$OrxY4lGm$auxiliary$2gfQmZCt</td>
-  </tr>
-  <tr>
-    <td class="name">LegacyStoreManagerGateway$MockitoMock$OrxY4lGm$auxiliary$2y7FqEOi</td>
-  </tr>
-  <tr>
-    <td class="name">LegacyStoreManagerGateway$MockitoMock$OrxY4lGm$auxiliary$gC96wevr</td>
-  </tr>
-  <tr>
-    <td class="name">LegacyStoreManagerGateway$MockitoMock$OrxY4lGm$auxiliary$M35fscED</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    25%
-  </span>
-  <span class="absValue">
-    (1/4)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    7.7%
+    100%
   </span>
   <span class="absValue">
-    (1/13)
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (18/18)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -97,56 +87,46 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.fulfilment.application.monolith.stores;
+<code class="sourceCode" id="sourceCode">&nbsp;package com.fulfilment.application.monolith.fulfillment;
 &nbsp;
 &nbsp;import jakarta.enterprise.context.ApplicationScoped;
-&nbsp;import java.nio.file.Files;
-&nbsp;import java.nio.file.Path;
+&nbsp;import jakarta.transaction.Transactional;
+&nbsp;import org.jboss.logging.Logger;
 &nbsp;
 &nbsp;@ApplicationScoped
-<b class="fc">&nbsp;public class LegacyStoreManagerGateway {</b>
+<b class="fc">&nbsp;public class AssociateWarehouseUseCase {</b>
 &nbsp;
-&nbsp;  public void createStoreOnLegacySystem(Store store) {
-&nbsp;    // just to emulate as this would send this to a legacy system, let&#39;s write a temp file with the
-<b class="nc">&nbsp;    writeToFile(store);</b>
-&nbsp;  }
+<b class="fc">&nbsp;    private static final Logger LOG = Logger.getLogger(AssociateWarehouseUseCase.class);</b>
 &nbsp;
-&nbsp;  public void updateStoreOnLegacySystem(Store store) {
-&nbsp;    // just to emulate as this would send this to a legacy system, let&#39;s write a temp file with the
-<b class="nc">&nbsp;    writeToFile(store);</b>
-&nbsp;  }
+&nbsp;    @Transactional
+&nbsp;    public void associate(Long storeId, Long warehouseId, Long productId) {
+<b class="fc">&nbsp;        LOG.info(&quot;Attempting to associate Warehouse &quot; + warehouseId + &quot; with Product &quot; + productId + &quot; for Store &quot; + storeId);</b>
 &nbsp;
-&nbsp;  private void writeToFile(Store store) {
-&nbsp;    try {
-&nbsp;      // Step 1: Create a temporary file
-&nbsp;      Path tempFile;
+&nbsp;        // Constraint 1: Each Product can be fulfilled by a maximum of 2 different Warehouses per Store
+<b class="fc">&nbsp;        long warehouseCountForProduct = FulfillmentAssociation.count(&quot;productId = ?1 and storeId = ?2&quot;, productId, storeId);</b>
+<b class="fc">&nbsp;        if (warehouseCountForProduct &gt;= 2) {</b>
+<b class="fc">&nbsp;            LOG.warn(&quot;Constraint Violated: Product already has 2 warehouses for this store&quot;);</b>
+<b class="fc">&nbsp;            throw new IllegalStateException(&quot;Maximum 2 warehouses allowed per product per store.&quot;);</b>
+&nbsp;        }
 &nbsp;
-<b class="nc">&nbsp;      tempFile = Files.createTempFile(store.name, &quot;.txt&quot;);</b>
+&nbsp;        // Constraint 2: Each Store can be fulfilled by a maximum of 3 different Warehouses
+<b class="fc">&nbsp;        long uniqueWarehouseCountForStore = FulfillmentAssociation.find(&quot;storeId = ?1&quot;, storeId)</b>
+<b class="fc">&nbsp;                .stream().map(f -&gt; ((FulfillmentAssociation)f).warehouseId).distinct().count();</b>
+<b class="fc">&nbsp;        if (uniqueWarehouseCountForStore &gt;= 3) {</b>
+<b class="fc">&nbsp;            LOG.warn(&quot;Constraint Violated: Store already has 3 warehouses&quot;);</b>
+<b class="fc">&nbsp;            throw new IllegalStateException(&quot;Maximum 3 warehouses allowed per store.&quot;);</b>
+&nbsp;        }
 &nbsp;
-<b class="nc">&nbsp;      System.out.println(&quot;Temporary file created at: &quot; + tempFile.toString());</b>
+&nbsp;        // Constraint 3: Each Warehouse can store maximally 5 types of Products
+<b class="fc">&nbsp;        long productTypeCount = FulfillmentAssociation.count(&quot;warehouseId = ?1&quot;, warehouseId);</b>
+<b class="fc">&nbsp;        if (productTypeCount &gt;= 5) {</b>
+<b class="fc">&nbsp;            LOG.warn(&quot;Constraint Violated: Warehouse reached max product types&quot;);</b>
+<b class="fc">&nbsp;            throw new IllegalStateException(&quot;Maximum 5 product types allowed per warehouse.&quot;);</b>
+&nbsp;        }
 &nbsp;
-&nbsp;      // Step 2: Write data to the temporary file
-<b class="nc">&nbsp;      String content =</b>
-&nbsp;          &quot;Store created. [ name =&quot;
-&nbsp;              + store.name
-&nbsp;              + &quot; ] [ items on stock =&quot;
-&nbsp;              + store.quantityProductsInStock
-&nbsp;              + &quot;]&quot;;
-<b class="nc">&nbsp;      Files.write(tempFile, content.getBytes());</b>
-<b class="nc">&nbsp;      System.out.println(&quot;Data written to temporary file.&quot;);</b>
-&nbsp;
-&nbsp;      // Step 3: Optionally, read the data back to verify
-<b class="nc">&nbsp;      String readContent = new String(Files.readAllBytes(tempFile));</b>
-<b class="nc">&nbsp;      System.out.println(&quot;Data read from temporary file: &quot; + readContent);</b>
-&nbsp;
-&nbsp;      // Step 4: Delete the temporary file when done
-<b class="nc">&nbsp;      Files.delete(tempFile);</b>
-<b class="nc">&nbsp;      System.out.println(&quot;Temporary file deleted.&quot;);</b>
-&nbsp;
-&nbsp;    } catch (Exception e) {
-<b class="nc">&nbsp;      e.printStackTrace();</b>
+<b class="fc">&nbsp;        new FulfillmentAssociation(storeId, warehouseId, productId).persist();</b>
+<b class="fc">&nbsp;        LOG.info(&quot;Association successful&quot;);</b>
 &nbsp;    }
-&nbsp;  }
 &nbsp;}
 </code>
 </pre>
@@ -171,7 +151,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-01-19 22:46</div>
+    <div style="float:right;">generated on 2026-01-20 00:04</div>
 </div>
 </body>
 </html>

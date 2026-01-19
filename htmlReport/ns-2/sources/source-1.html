@@ -55,7 +55,7 @@ Current scope:     <a href="../../index.html">all classes</a>
     100%
   </span>
   <span class="absValue">
-    (3/3)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
@@ -63,7 +63,7 @@ Current scope:     <a href="../../index.html">all classes</a>
     100%
   </span>
   <span class="absValue">
-    (14/14)
+    (18/18)
   </span>
 </td>
 </tr>
@@ -82,10 +82,12 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;import jakarta.enterprise.context.ApplicationScoped;
 &nbsp;import java.util.ArrayList;
 &nbsp;import java.util.List;
+&nbsp;import org.jboss.logging.Logger;
 &nbsp;
 &nbsp;@ApplicationScoped
 <b class="fc">&nbsp;public class LocationGateway implements LocationResolver {</b>
 &nbsp;
+<b class="fc">&nbsp;    private static final Logger LOG = Logger.getLogger(LocationGateway.class);</b>
 <b class="fc">&nbsp;  private static final List&lt;Location&gt; locations = new ArrayList&lt;&gt;();</b>
 &nbsp;
 &nbsp;  static {
@@ -101,10 +103,14 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;
 &nbsp;  @Override
 &nbsp;  public Location resolveByIdentifier(String identifier) {
+<b class="fc">&nbsp;      LOG.debug(&quot;Resolving location for identifier: &quot; + identifier);</b>
 <b class="fc">&nbsp;      return locations.stream()</b>
 <b class="fc">&nbsp;              .filter(loc -&gt; loc.identification.equals(identifier))</b>
 <b class="fc">&nbsp;              .findFirst()</b>
-<b class="fc">&nbsp;              .orElseThrow(() -&gt; new RuntimeException(&quot;Location not found: &quot; + identifier));</b>
+<b class="fc">&nbsp;              .orElseThrow(() -&gt; {</b>
+<b class="fc">&nbsp;                  LOG.warn(&quot;Location not found for identifier: &quot; + identifier);</b>
+<b class="fc">&nbsp;                  return new RuntimeException(&quot;Location not found: &quot; + identifier);</b>
+&nbsp;              });
 &nbsp;  }
 &nbsp;}
 </code>
@@ -130,7 +136,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-01-19 22:39</div>
+    <div style="float:right;">generated on 2026-01-20 00:04</div>
 </div>
 </body>
 </html>

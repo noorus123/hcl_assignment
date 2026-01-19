@@ -5,10 +5,12 @@ import com.fulfilment.application.monolith.warehouses.domain.ports.LocationResol
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.ArrayList;
 import java.util.List;
+import org.jboss.logging.Logger;
 
 @ApplicationScoped
 public class LocationGateway implements LocationResolver {
 
+    private static final Logger LOG = Logger.getLogger(LocationGateway.class);
   private static final List<Location> locations = new ArrayList<>();
 
   static {
@@ -24,9 +26,13 @@ public class LocationGateway implements LocationResolver {
 
   @Override
   public Location resolveByIdentifier(String identifier) {
+      LOG.debug("Resolving location for identifier: " + identifier);
       return locations.stream()
               .filter(loc -> loc.identification.equals(identifier))
               .findFirst()
-              .orElseThrow(() -> new RuntimeException("Location not found: " + identifier));
+              .orElseThrow(() -> {
+                  LOG.warn("Location not found for identifier: " + identifier);
+                  return new RuntimeException("Location not found: " + identifier);
+              });
   }
 }

@@ -13,7 +13,6 @@ public class ReplaceWarehouseUseCase implements ReplaceWarehouseOperation {
     private final ArchiveWarehouseUseCase archiveWarehouseUseCase;
     private final CreateWarehouseUseCase createWarehouseUseCase;
 
-    // We inject the other UseCases to reuse their logic (DRY Principle)
     public ReplaceWarehouseUseCase(WarehouseStore warehouseStore,
                                    ArchiveWarehouseUseCase archiveWarehouseUseCase,
                                    CreateWarehouseUseCase createWarehouseUseCase) {
@@ -23,7 +22,7 @@ public class ReplaceWarehouseUseCase implements ReplaceWarehouseOperation {
     }
 
     @Override
-    @Transactional // Ensure the swap happens atomically
+    @Transactional
     public void replace(String oldBusinessUnitCode, Warehouse newWarehouse) {
 
         // 1. Find the Old Warehouse
@@ -33,25 +32,20 @@ public class ReplaceWarehouseUseCase implements ReplaceWarehouseOperation {
         }
 
         // 2. Validate: Capacity Accommodation
-        // "Ensure the new warehouse's capacity can accommodate the stock from the warehouse being replaced."
         if (newWarehouse.capacity < oldWarehouse.stock) {
             throw new IllegalArgumentException("New warehouse capacity (" + newWarehouse.capacity
                     + ") is too small for existing stock (" + oldWarehouse.stock + ")");
         }
 
         // 3. Validate: Stock Matching
-        // "Confirm that the stock of the new warehouse matches the stock of the previous warehouse."
-        // (Assuming we move the stock over exactly)
         if (!newWarehouse.stock.equals(oldWarehouse.stock)) {
             throw new IllegalArgumentException("New warehouse stock must match the old warehouse stock during replacement.");
         }
 
         // 4. Archive the Old Warehouse
-        // This frees up the "Location Count" limit logic in CreateUseCase
         archiveWarehouseUseCase.archive(oldWarehouse);
 
         // 5. Create the New Warehouse
-        // This runs all the location validity checks defined in CreateUseCase
         createWarehouseUseCase.create(newWarehouse);
     }
 }
